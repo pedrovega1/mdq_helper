@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Support Admin Panel</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div id="login-screen" class="login-wrapper">
+        <div class="login-card">
+            <h2>IT Admin Access</h2>
+            <input type="password" id="admin-password" placeholder="Пароль администратора">
+            <button id="login-btn">Войти</button>
+            <p id="login-error" style="color:#ef4444; display:none; margin-top:10px;">Неверный пароль!</p>
+        </div>
+    </div>
+
+    <div id="admin-panel" class="app-container" style="display: none;">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>IT Support</h2>
+                <button id="logout-btn" class="logout-btn">Выход</button>
+            </div>
+            <nav>
+                <button data-tab="dashboard" class="tab-trigger active">Дашборд</button>
+                <button data-tab="calendar-view" class="tab-trigger">Календарь</button>
+                <button data-tab="timeline" class="tab-trigger">Шкала</button>
+            </nav>
+        </aside>
+
+        <main class="content">
+            <section id="dashboard" class="tab-content active">
+                <div id="stats-container" class="stats-grid"></div>
+                <div class="filters-bar">
+                    <input type="text" id="searchInput" placeholder="Поиск по ФИО или номеру...">
+                    <select id="statusFilter">
+                        <option value="all">Все статусы</option>
+                        <option value="new">Новые</option>
+                        <option value="in_progress">В работе</option>
+                        <option value="resolved">Решенные</option>
+                    </select>
+                </div>
+                <div id="ticketsList" class="tickets-list"></div>
+            </section>
+
+            <section id="calendar-view" class="tab-content">
+                <h2>Календарь активности</h2>
+                <div id="calendar-grid" class="calendar-grid"></div>
+            </section>
+
+            <section id="timeline" class="tab-content">
+                <h2>История действий</h2>
+                <div id="timeline-container" class="timeline-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="close-modal">&times;</span>
+            <h3>История заявки</h3>
+            <div id="historyLogs"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/script.js"></script>
+</body>
+</html>
