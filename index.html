@@ -10,31 +10,67 @@
 <body>
     <div id="login-screen" class="login-wrapper">
         <div class="login-card">
-            <h2>IT Admin Access</h2>
-            <input type="password" id="admin-password" placeholder="Пароль администратора">
-            <button id="login-btn">Войти</button>
-            <p id="login-error" style="color:#ef4444; display:none; margin-top:10px;">Неверный пароль!</p>
+            <div class="login-header">
+                <div class="login-icon">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                <div>
+                    <h2>IT Admin Access</h2>
+                    <p class="login-subtitle">Панель управления обращениями IT‑поддержки</p>
+                </div>
+            </div>
+
+            <label for="admin-password" class="field-label">Пароль администратора</label>
+            <div class="password-field">
+                <input type="password" id="admin-password" placeholder="Введите пароль" autocomplete="current-password">
+                <button type="button" id="toggle-password" class="icon-btn" aria-label="Показать пароль">
+                    <i data-lucide="eye"></i>
+                </button>
+            </div>
+
+            <button id="login-btn" class="primary-btn login-btn-full">
+                <i data-lucide="log-in"></i>
+                Войти
+            </button>
+
+            <p id="login-error" class="login-error">Неверный пароль!</p>
+            <p class="login-hint">Доступ только для сотрудников IT‑отдела. Не передавайте пароль третьим лицам.</p>
         </div>
     </div>
 
     <div id="admin-panel" class="app-container" style="display: none;">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>IT Support</h2>
-                <button id="logout-btn" class="logout-btn">Выход</button>
+                <div class="logo-area">
+                    <i data-lucide="terminal"></i>
+                    <h2>IT Support</h2>
+                </div>
+                <button id="logout-btn" class="logout-btn" title="Выйти">
+                    <i data-lucide="log-out"></i>
+                </button>
             </div>
             <nav>
-                <button data-tab="dashboard" class="tab-trigger active">Дашборд</button>
-                <button data-tab="calendar-view" class="tab-trigger">Календарь</button>
-                <button data-tab="timeline" class="tab-trigger">Шкала</button>
+                <button data-tab="dashboard" class="tab-trigger active">
+                    <i data-lucide="layout-dashboard"></i> Дашборд
+                </button>
+                <button data-tab="calendar-view" class="tab-trigger">
+                    <i data-lucide="calendar"></i> Календарь
+                </button>
+                <button data-tab="timeline" class="tab-trigger">
+                    <i data-lucide="history"></i> Шкала
+                </button>
             </nav>
         </aside>
 
         <main class="content">
             <section id="dashboard" class="tab-content active">
                 <div id="stats-container" class="stats-grid"></div>
+                
                 <div class="filters-bar">
-                    <input type="text" id="searchInput" placeholder="Поиск по ФИО или номеру...">
+                    <div class="search-wrapper">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="searchInput" placeholder="Поиск по ФИО или номеру...">
+                    </div>
                     <select id="statusFilter">
                         <option value="all">Все статусы</option>
                         <option value="new">Новые</option>
@@ -42,7 +78,8 @@
                         <option value="resolved">Решенные</option>
                     </select>
                 </div>
-                <div id="ticketsList" class="tickets-list"></div>
+
+                <div id="ticketsList" class="tickets-grid"></div>
             </section>
 
             <section id="calendar-view" class="tab-content">
@@ -57,11 +94,62 @@
         </main>
     </div>
 
-    <div id="historyModal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
-            <h3>История заявки</h3>
-            <div id="historyLogs"></div>
+    <div id="ticketModal" class="modal">
+        <div class="modal-content ticket-detail-view">
+            <header class="modal-header">
+                <div class="ticket-info">
+                    <span id="modalTicketNumber" class="ticket-num"></span>
+                    <h3 id="modalUserName"></h3>
+                </div>
+                <button class="close-btn" id="close-ticket-modal">&times;</button>
+            </header>
+
+            <div class="modal-body">
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"></div>
+                    
+                    <div class="chat-input-area">
+                        <textarea id="adminReplyText" placeholder="Напишите ответ пользователю..."></textarea>
+                        <div class="chat-controls">
+                            <div id="statusWrapper" class="status-select-wrapper">
+                                <label class="field-label small-label">Статус заявки</label>
+                                <select id="modalStatusSelect">
+                                    <option value="new">Новая</option>
+                                    <option value="in_progress">В работе</option>
+                                    <option value="resolved">Решена</option>
+                                </select>
+                            </div>
+                            <button id="sendReplyBtn" type="button" class="primary-btn">
+                                <i data-lucide="save"></i> Сохранить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="ticket-sidebar">
+                    <h4>Инфо</h4>
+                    <div class="info-item">
+                        <label>Отдел:</label>
+                        <span id="modalDept"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>TG:</label>
+                        <span id="modalTgUser"></span>
+                    </div>
+                    <hr>
+                    <button id="viewHistoryBtn" class="secondary-btn">Посмотреть логи</button>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <div id="historyModal" class="modal second-modal">
+        <div class="modal-content compact-modal">
+            <header class="modal-header">
+                <h3>Логи заявки</h3>
+                <button class="close-btn" id="close-history-modal">&times;</button>
+            </header>
+            <div id="historyLogs" class="logs-container"></div>
         </div>
     </div>
 

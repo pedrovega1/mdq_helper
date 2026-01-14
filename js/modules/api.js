@@ -12,19 +12,22 @@ async function secureFetch(endpoint, options = {}) {
 
     const response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
 
+    // При 401 больше не делаем location.reload(), чтобы не закрывать модалки внезапно
     if (response.status === 401) {
-        Auth.logout();
-        throw new Error('Unauthorized');
+        throw new Error('Unauthorized (401) — проверь пароль администратора / токен');
     }
 
-    // Проверяем, что сервер вернул именно JSON, прежде чем его парсить
-    const contentType = response.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-        return await response.json();
+    // Сначала читаем ответ (JSON, если есть), затем обязательно проверяем response.ok
+    const contentType = response.headers.get('content-type') || '';
+    const isJson = contentType.includes('application/json');
+    const data = isJson ? await response.json() : null;
+
+    if (!response.ok) {
+        const msg = (data && (data.error || data.message)) ? (data.error || data.message) : `Server error: ${response.status}`;
+        throw new Error(msg);
     }
-    
-    if (!response.ok) throw new Error(`Server error: ${response.status}`);
-    return {}; 
+
+    return data ?? {};
 }
 
 export const API = {
