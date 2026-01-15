@@ -6,7 +6,7 @@
     "telegramUser": "@mainkhm",
     "department": "Бабала",
     "telegramId": 955860863,
-    "status": "new",
+    "status": "in_progress",
     "created": "2026-01-14T11:53:51.611Z",
     "messages": [
       {
@@ -123,12 +123,37 @@
         "role": "admin",
         "text": "выфвфы",
         "time": "2026-01-14T13:01:37.789Z"
+      },
+      {
+        "role": "admin",
+        "text": "вфы",
+        "time": "2026-01-15T06:30:06.430Z"
+      },
+      {
+        "role": "admin",
+        "text": "выфв",
+        "time": "2026-01-15T06:30:20.339Z"
       }
     ],
     "history": [
       {
         "action": "Создано",
         "time": "2026-01-14T11:53:51.611Z"
+      },
+      {
+        "action": "Добавлен комментарий",
+        "admin": "admin",
+        "time": "2026-01-15T06:30:06.823Z"
+      },
+      {
+        "action": "Добавлен комментарий",
+        "admin": "admin",
+        "time": "2026-01-15T06:30:20.447Z"
+      },
+      {
+        "action": "Статус изменён: new → in_progress",
+        "admin": "admin",
+        "time": "2026-01-15T06:33:10.265Z"
       }
     ]
   }

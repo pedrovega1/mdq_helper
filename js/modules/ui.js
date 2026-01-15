@@ -1,4 +1,4 @@
-// Простая функция экранирования HTML, чтобы защититься от XSS при выводе данных пользователя
+// Простая функция экранирования HTML
 const escapeHtml = (value = '') =>
     String(value)
         .replace(/&/g, '&amp;')
@@ -11,15 +11,24 @@ export const UI = {
     renderTickets: (tickets, config) => {
         const list = document.getElementById('ticketsList');
         if (!list) return;
+        
         const { search, statusFilter } = config;
         
+        // Backend уже вернул данные в правильном формате (camelCase)
         const filtered = tickets.filter(t => {
             const name = (t.userRealName || "").toLowerCase();
             const tg = (t.telegramUser || "").toLowerCase();
             const num = (t.number || "").toLowerCase();
             const dept = (t.department || "").toLowerCase();
-            return (name.includes(search) || tg.includes(search) || num.includes(search) || dept.includes(search)) && 
-                   (statusFilter === 'all' || t.status === statusFilter);
+            
+            const matchesSearch = name.includes(search) || 
+                                 tg.includes(search) || 
+                                 num.includes(search) || 
+                                 dept.includes(search);
+            
+            const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
+            
+            return matchesSearch && matchesStatus;
         });
 
         if (filtered.length === 0) {
@@ -30,17 +39,23 @@ export const UI = {
         list.innerHTML = filtered.map(t => {
             const safeId = escapeHtml(t.id);
             const safeNumber = escapeHtml(t.number || '');
-            const safeName = escapeHtml(t.userRealName || '');
-            const safeDept = escapeHtml(t.department || '');
-            const safeTg = escapeHtml(t.telegramUser || '');
-            const created = t.created ? new Date(t.created).toLocaleDateString() : '';
+            const safeName = escapeHtml(t.userRealName || 'Не указано');
+            const safeDept = escapeHtml(t.department || 'Не указан');
+            const safeTg = escapeHtml(t.telegramUser || '@не_указан');
+            const created = t.created ? new Date(t.created).toLocaleDateString('ru-RU') : '';
+
+            const statusText = {
+                'new': 'Новая',
+                'in_progress': 'В работе',
+                'resolved': 'Решена'
+            }[t.status] || t.status;
 
             return `
             <div class="ticket-card" data-id="${safeId}">
                 <div class="ticket-header">
                     <span class="ticket-num">${safeNumber}</span>
                     <span class="status-badge status-${t.status}">
-                        ${t.status === 'new' ? 'Новая' : t.status === 'in_progress' ? 'В работе' : 'Решена'}
+                        ${statusText}
                     </span>
                 </div>
                 <h3>${safeName}</h3>
@@ -61,6 +76,8 @@ export const UI = {
         const html = (ticket.messages || []).map(m => {
             const isAdmin = m.role === 'admin';
             const safeText = escapeHtml(m.text || '');
+            const timeStr = m.time ? new Date(m.time).toLocaleTimeString('ru-RU', {hour: '2-digit', minute:'2-digit'}) : '';
+            
             return `
                 <div style="display: flex; margin-bottom: 8px; flex-direction: column; align-items: ${isAdmin ? 'flex-end' : 'flex-start'};">
                     <div style="max-width: 75%; padding: 8px 12px; border-radius: 15px; font-size: 0.9rem; ${
@@ -69,7 +86,7 @@ export const UI = {
                     }">
                         <div style="word-break: break-word;">${safeText}</div>
                         <div style="font-size: 10px; opacity: 0.7; text-align: right; margin-top: 4px;">
-                            ${new Date(m.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            ${timeStr}
                         </div>
                     </div>
                 </div>
@@ -86,10 +103,11 @@ export const UI = {
         const modal = document.getElementById('ticketModal');
         if (!modal) return;
 
-        document.getElementById('modalTicketNumber').textContent = ticket.number;
-        document.getElementById('modalUserName').textContent = ticket.userRealName;
-        document.getElementById('modalDept').textContent = ticket.department;
-        document.getElementById('modalTgUser').textContent = ticket.telegramUser || '@нет_данных';
+        // Backend уже вернул правильные поля (camelCase)
+        document.getElementById('modalTicketNumber').textContent = ticket.number || 'N/A';
+        document.getElementById('modalUserName').textContent = ticket.userRealName || 'Не указано';
+        document.getElementById('modalDept').textContent = ticket.department || 'Не указан';
+        document.getElementById('modalTgUser').textContent = ticket.telegramUser || '@не_указан';
         document.getElementById('modalStatusSelect').value = ticket.status;
         document.getElementById('sendReplyBtn').setAttribute('data-id', ticket.id);
 
@@ -99,7 +117,6 @@ export const UI = {
             statusWrapper.classList.add(`status-${ticket.status}`);
         }
 
-        // Используем UI. вместо this.
         UI.updateChatOnly(ticket);
         modal.style.display = 'flex';
     },
@@ -110,6 +127,7 @@ export const UI = {
             in_progress: tickets.filter(t => t.status === 'in_progress').length,
             resolved: tickets.filter(t => t.status === 'resolved').length
         };
+        
         const cont = document.getElementById('stats-container');
         if (cont) {
             cont.innerHTML = `
@@ -124,6 +142,9 @@ export const UI = {
 export const Auth = {
     getToken: () => localStorage.getItem('admin_token'),
     setToken: (token) => localStorage.setItem('admin_token', token),
-    logout: () => { localStorage.removeItem('admin_token'); location.reload(); },
+    logout: () => { 
+        localStorage.removeItem('admin_token'); 
+        location.reload(); 
+    },
     isLoggedIn: () => !!localStorage.getItem('admin_token')
 };
